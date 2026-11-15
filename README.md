@@ -106,8 +106,8 @@ CI (`.github/workflows/ci.yml`) runs on every push and pull request:
 
 - **Lint**: `bash -n`, ShellCheck, and JSON/TOML parsing of the seeded configs
 - **Secret scan**: gitleaks over the full history
-- **Bootstrap**: the test script on Ubuntu and macOS, and again on macOS with
-  the system Bash 3.2
+- **Bootstrap**: the test script on Ubuntu (Bash 5) and macOS (the system
+  Bash 3.2)
 
 WSL is not available on hosted runners; the WSL-specific paths (clipboard via
 `clip.exe`, the `wsl-ssh` group) are exercised only by running locally.
