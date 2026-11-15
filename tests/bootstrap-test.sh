@@ -3,12 +3,15 @@
 # End-to-end test for bootstrap.sh against a throwaway home directory.
 # Runs locally or in CI. Set BASH_BIN=/bin/bash on macOS to exercise Bash 3.2.
 
+# Single-quoted $ in sh -c helpers is intentional: the inner shell expands it.
+# shellcheck disable=SC2016
+
 set -eu
 
-repo=$(CDPATH= cd -P "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+repo=$(CDPATH='' cd -P "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 bash_bin=${BASH_BIN:-bash}
 test_home=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-test.XXXXXX")
-test_home=$(CDPATH= cd -P "$test_home" && pwd)
+test_home=$(CDPATH='' cd -P "$test_home" && pwd)
 log="$test_home/.bootstrap.log"
 trap 'rm -rf "$test_home"' EXIT
 

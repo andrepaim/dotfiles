@@ -5,7 +5,7 @@
 
 set -e
 
-script_dir=$(CDPATH= cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+script_dir=$(CDPATH='' cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 all_groups="shell git tmux vim agents skills tools services"
 
 usage() {
@@ -77,7 +77,7 @@ if [ -z "$target_home" ] || [ ! -d "$target_home" ]; then
 	printf 'The target home must name an existing directory.\n' >&2
 	exit 1
 fi
-target_home=$(CDPATH= cd -P "$target_home" && pwd)
+target_home=$(CDPATH='' cd -P "$target_home" && pwd)
 src_dir=${DOTFILES_SRC_DIR:-$target_home/src}
 
 os=$(uname -s)
@@ -103,7 +103,7 @@ have() {
 has_user_systemd() {
 	# systemctl --user acts on the real user session, so only manage units
 	# when installing into that user's own home.
-	[ "$target_home" = "$(CDPATH= cd -P "$HOME" && pwd)" ] &&
+	[ "$target_home" = "$(CDPATH='' cd -P "$HOME" && pwd)" ] &&
 		[ "$os" = Linux ] && have systemctl &&
 		systemctl --user show-environment >/dev/null 2>&1
 }
@@ -291,7 +291,7 @@ if want services; then
 			printf 'note: skipping saldo.service (%s/saldo not found)\n' "$src_dir"
 		fi
 	else
-		printf 'note: skipping services (needs Linux, a systemd user session, and the real $HOME)\n'
+		printf 'note: skipping services (needs Linux, a systemd user session, and the real home)\n'
 	fi
 fi
 
