@@ -1,5 +1,7 @@
 # Dotfiles
 
+[![CI](https://github.com/andrepaim/dotfiles/actions/workflows/ci.yml/badge.svg)](https://github.com/andrepaim/dotfiles/actions/workflows/ci.yml)
+
 Shell, terminal, editor, and AI-agent configuration for WSL, Linux, and macOS.
 
 `bootstrap.sh` installs an explicit manifest into `$HOME`. It does not install
@@ -92,6 +94,23 @@ Credentials and tokens (`~/.claude/.credentials.json`, `~/.codex/auth.json`,
 `~/.pi/agent/auth.json`, `~/.npmrc`, `~/.ssh/`), shell and agent history,
 sessions, caches, and databases. `.gitignore` blocks the common names as a
 second line of defence.
+
+## Tests
+
+`tests/bootstrap-test.sh` installs into a throwaway home and checks the dry
+run, the conflict prompt, backups, link targets, seed rendering, idempotence,
+`--update-seeds`, and that the shell, tmux, and status-line configs load. Run
+it locally with `tests/bootstrap-test.sh`.
+
+CI (`.github/workflows/ci.yml`) runs on every push and pull request:
+
+- **Lint**: `bash -n`, ShellCheck, and JSON/TOML parsing of the seeded configs
+- **Secret scan**: gitleaks over the full history
+- **Bootstrap**: the test script on Ubuntu and macOS, and again on macOS with
+  the system Bash 3.2
+
+WSL is not available on hosted runners; the WSL-specific paths (clipboard via
+`clip.exe`, the `wsl-ssh` group) are exercised only by running locally.
 
 ## Update
 

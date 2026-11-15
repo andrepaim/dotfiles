@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shell syntax
+        run: |
+          for f in bootstrap.sh tests/bootstrap-test.sh .bashrc \
+                   .tmux/status.sh .claude/statusline-command.sh; do
+            bash -n "$f"
+          done
+
+      - name: ShellCheck
+        run: |
+          shellcheck --version
+          shellcheck bootstrap.sh tests/bootstrap-test.sh \
+            .tmux/status.sh .claude/statusline-command.sh
+          shellcheck --shell=bash --exclude=SC1090,SC1091 .bashrc
+
+      - name: Config files parse
+        run: |
+          python3 - <<'PY'
+          import json, re, tomllib, pathlib
+
+          for path in [".claude/settings.json", ".pi/agent/settings.json",
+                       ".agents/.skill-lock.json"]:
+              json.loads(pathlib.Path(path).read_text())
+              print("json ok ", path)
+
+          # JSONC: strip // comments before parsing.
+          text = pathlib.Path(".config/opencode/opencode.jsonc").read_text()
+          json.loads(re.sub(r"^\s*//.*$", "", text, flags=re.M))
+          print("jsonc ok", ".config/opencode/opencode.jsonc")
+
+          for path in [".codex/config.toml", ".config/agent-deck/config.toml"]:
+              tomllib.loads(pathlib.Path(path).read_text())
+              print("toml ok ", path)
+          PY
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  bootstrap:
+    name: Bootstrap (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shells and tmux (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends zsh tmux
+
+      - name: Install tmux (macOS)
+        if: runner.os == 'macOS'
+        run: brew install tmux
+
+      - name: Test bootstrap with default bash
+        run: tests/bootstrap-test.sh
+
+      - name: Test bootstrap with macOS Bash 3.2
+        if: runner.os == 'macOS'
+        run: BASH_BIN=/bin/bash /bin/bash tests/bootstrap-test.sh
