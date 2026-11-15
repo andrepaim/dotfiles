@@ -97,6 +97,32 @@ case "$1" in
 		printf ' %s%s%s' "$branch" "$dirty" "$ahead_behind"
 		;;
 
+	battery)
+		# Omit the entire segment on hosts without a battery.
+		if [ "$(uname -s)" = Darwin ]; then
+			pmset -g batt 2>/dev/null | awk -F ';' '
+				/%/ {
+					percent = $1; sub(/^.*[[:space:]]/, "", percent)
+					state = $2; gsub(/^[[:space:]]+|[[:space:]]+$/, "", state)
+					printf " | BAT %s %s", percent, state
+					exit
+				}
+			'
+		else
+			for battery in /sys/class/power_supply/*; do
+				[ -r "$battery/type" ] || continue
+				[ "$(cat "$battery/type")" = Battery ] || continue
+				[ -r "$battery/capacity" ] || continue
+				if [ -r "$battery/present" ] && [ "$(cat "$battery/present")" = 0 ]; then
+					continue
+				fi
+				capacity=$(cat "$battery/capacity")
+				state=$(cat "$battery/status" 2>/dev/null)
+				printf ' | BAT %s%% %s' "$capacity" "$state"
+			done
+		fi
+		;;
+
 	gpu)
 		if command -v nvidia-smi >/dev/null 2>&1; then
 			nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total \
@@ -126,7 +152,7 @@ case "$1" in
 		;;
 
 	*)
-		printf 'usage: %s {cpu|mem|disk|uptime|gpu|git <path>|clipboard}\n' "$0" >&2
+		printf 'usage: %s {cpu|mem|disk|uptime|battery|gpu|git <path>|clipboard}\n' "$0" >&2
 		exit 2
 		;;
 esac
