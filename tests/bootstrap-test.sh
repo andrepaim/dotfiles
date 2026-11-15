@@ -33,7 +33,18 @@ snapshot() {
 	(cd "$test_home" && find . -path ./.bootstrap.log -prune -o -print | LC_ALL=C sort)
 }
 
-printf 'bootstrap test: %s (%s)\n\n' "$("$bash_bin" -c 'echo "$BASH_VERSION"')" "$(uname -s)"
+is_wsl=false
+if grep -qi microsoft /proc/version 2>/dev/null; then
+	is_wsl=true
+fi
+platform=$(uname -s)
+$is_wsl && platform="$platform, WSL"
+printf 'bootstrap test: bash %s (%s)\n\n' "$("$bash_bin" -c 'echo "$BASH_VERSION"')" "$platform"
+
+# CI sets EXPECT_WSL=1 on the WSL job so a silent fallback to plain Linux fails.
+if [ "${EXPECT_WSL:-}" = 1 ]; then
+	check 'running inside WSL' $is_wsl
+fi
 
 # Pre-existing state: a file to back up, a seed to keep, one external skill.
 printf 'old bashrc\n' > "$test_home/.bashrc"
@@ -47,7 +58,14 @@ status=0; bootstrap nosuchgroup >/dev/null 2>&1 || status=$?
 check 'unknown group exits 2' [ "$status" -eq 2 ]
 bootstrap_quiet() { bootstrap "$@" >/dev/null 2>&1; }
 check '--help succeeds' bootstrap_quiet --help
-if ! grep -qi microsoft /proc/version 2>/dev/null; then
+if $is_wsl; then
+	# Plan only: executing the group needs sudo and reconfigures sshd.
+	bootstrap --dry-run wsl-ssh > "$log" 2>&1 || true
+	check 'wsl-ssh plans the sshd drop-in' \
+		grep -q '/etc/ssh/sshd_config.d/10-wsl-lan.conf' "$log"
+	check 'wsl-ssh plans the ssh.socket drop-in' \
+		grep -q '/etc/systemd/system/ssh.socket.d/10-ipv4-only.conf' "$log"
+else
 	status=0; bootstrap wsl-ssh >/dev/null 2>&1 || status=$?
 	check 'wsl-ssh refuses outside WSL' [ "$status" -eq 1 ]
 fi
@@ -136,6 +154,17 @@ done
 check 'claude status line renders' sh -c \
 	'printf "%s" "{\"model\":{\"display_name\":\"Test\"},\"cwd\":\"/\"}" | bash "$1" | grep -q Test' \
 	_ "$test_home/.claude/statusline-command.sh"
+
+# Only in CI: locally this would overwrite the real clipboard.
+if [ -n "${CI:-}" ]; then
+	if $is_wsl; then
+		check 'clip.exe is reachable from WSL' command -v clip.exe
+	fi
+	if command -v clip.exe >/dev/null 2>&1 || command -v pbcopy >/dev/null 2>&1; then
+		check 'tmux clipboard helper copies' \
+			sh -c 'printf dotfiles-ci | "$1" clipboard' _ "$test_home/.tmux/status.sh"
+	fi
+fi
 
 printf '\n'
 if [ "$failures" -gt 0 ]; then

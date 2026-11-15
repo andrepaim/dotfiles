@@ -86,3 +86,36 @@ jobs:
       # also covers bootstrap's Bash 3.2 compatibility.
       - name: Test bootstrap
         run: tests/bootstrap-test.sh
+
+  wsl:
+    name: Bootstrap (Windows WSL2, Ubuntu 24.04)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: wsl-bash {0}
+    env:
+      EXPECT_WSL: '1'
+      # Pass these into WSL; /p translates the Windows path.
+      WSLENV: CI:EXPECT_WSL:GITHUB_WORKSPACE/p
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: Vampire/setup-wsl@v7
+        with:
+          distribution: Ubuntu-24.04
+          wsl-version: '2'
+          additional-packages: git zsh tmux jq
+
+      # The Windows checkout has CRLF line endings and lives on /mnt/d.
+      # Clone it into the Linux filesystem, as a real WSL install would be.
+      - name: Clone into the WSL filesystem
+        run: |
+          git config --global --add safe.directory '*'
+          git clone --quiet "$GITHUB_WORKSPACE" "$HOME/src/dotfiles"
+          git -C "$HOME/src/dotfiles" log -1 --oneline
+          grep -q microsoft /proc/version && uname -r
+
+      - name: Test bootstrap
+        run: |
+          cd "$HOME/src/dotfiles"
+          tests/bootstrap-test.sh
