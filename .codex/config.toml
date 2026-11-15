@@ -6,7 +6,7 @@ model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 
 [tui]
-status_line = ["model-with-reasoning", "current-dir", "approval-mode", "context-remaining", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "git-branch", "branch-changes", "run-state", "permissions"]
+status_line = ["model-with-reasoning", "current-dir", "thread-name", "project-name", "git-branch", "branch-changes", "permissions", "context-remaining", "weekly-limit", "task-progress"]
 status_line_use_colors = true
 
 [marketplaces.openai-bundled]
