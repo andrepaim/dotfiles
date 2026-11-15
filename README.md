@@ -1,14 +1,31 @@
-# Dotfiles
+# Andre's dotfiles
 
 [![CI](https://github.com/andrepaim/dotfiles/actions/workflows/ci.yml/badge.svg)](https://github.com/andrepaim/dotfiles/actions/workflows/ci.yml)
 
-Shell, terminal, editor, and AI-agent configuration for WSL, Linux, and macOS.
+My personal development setup for Linux, macOS, and WSL: shell, tmux, Vim,
+Git, and AI-agent tooling, installed through one bootstrap script.
 
-`bootstrap.sh` installs an explicit manifest into `$HOME`. It does not install
-packages, change the login shell, or modify operating-system settings (except
-the opt-in `wsl-ssh` group, which uses `sudo`).
+Inspired by [Mathias Bynens' dotfiles](https://github.com/mathiasbynens/dotfiles)
+and developed around my own workflow. I maintain this setup independently,
+without plans to sync changes from the original repository.
+
+## What's included
+
+- Bash and zsh configuration, with machine-specific overrides.
+- A dark blue/gray tmux theme, `Ctrl-a` prefix, Vim-style navigation,
+  mouse support, and Git, CPU, RAM, battery, GPU, disk, uptime, and clock
+  status segments.
+- Vim with a Tokyo Night theme, fuzzy finding, Git integration, and linting.
+- Settings for Claude Code, Codex, opencode, pi, and agent-deck, plus
+  shared [agent skills](skills/README.md).
+- btop and htop settings, Linux user services, and an opt-in WSL SSH setup.
 
 ## Install
+
+`bootstrap.sh` installs an explicit manifest into `$HOME`. It links or copies
+configuration and enables applicable systemd user services. Install packages
+separately. The opt-in `wsl-ssh` group also changes system SSH settings using
+`sudo`.
 
 ```sh
 git clone git@github.com:andrepaim/dotfiles.git ~/src/dotfiles
@@ -66,18 +83,26 @@ Platform handling:
   The drop-in allows password authentication for the installing user; keep the
   firewall rule restricted to your LAN subnet.
 
-## Requirements
+## Requirements and platform support
 
-- zsh or bash, tmux, Vim
+- Bash to run bootstrap; install zsh, tmux, and Vim for the configurations
+  you use
 - Git and curl (Vim installs vim-plug and plugins on first launch)
 - ripgrep for Vim's `:Rg`
 - jq for the Claude Code status line
 
-Clipboard integration in tmux and Vim picks the first available of
-`clip.exe` (WSL), `pbcopy` (macOS), `wl-copy`, `xclip`, or `xsel`. GPU status
-appears only when `nvidia-smi` exists. Homebrew is added to `PATH` when found.
+Tmux clipboard integration picks the first available of `clip.exe` (WSL),
+`pbcopy` (macOS), `wl-copy`, `xclip`, or `xsel`. Vim uses native clipboard
+support when available, otherwise the same external commands. GPU status
+appears when `nvidia-smi` provides data. Battery percentage and charging state
+are read from Linux's `/sys/class/power_supply` or macOS's `pmset`; the segment
+is omitted when no battery is exposed. WSL battery display therefore depends
+on whether Linux exposes a battery. Homebrew is added to `PATH` when found.
 
 ## Local, uncommitted overrides
+
+The tracked Git configuration contains my name and email. Set your own
+identity in `~/.gitconfig.local` if you reuse this setup.
 
 | File | Read by |
 | --- | --- |
@@ -118,8 +143,29 @@ git pull --ff-only
 ./bootstrap.sh   # only needed when the manifest changes
 ```
 
+Reload running tools after pulling changes. For an existing tmux session:
+
+```sh
+tmux source-file ~/.tmux.conf
+```
+
+For seeded settings, inspect and apply updates explicitly:
+
+```sh
+./bootstrap.sh --dry-run --update-seeds agents tools
+./bootstrap.sh --update-seeds agents tools
+```
+
 ## Uninstall
 
 Remove the links that point into this checkout and restore what you need from
 `~/.dotfiles-backup/`. There is no automatic uninstaller, so nothing unrelated
 can be removed by accident.
+
+## Credits and license
+
+Inspired by and originally derived from
+[Mathias Bynens' dotfiles](https://github.com/mathiasbynens/dotfiles).
+The original copyright and MIT license are preserved in
+[LICENSE-MIT.txt](LICENSE-MIT.txt). Vendored agent skills have their own
+attribution in [skills/README.md](skills/README.md).
