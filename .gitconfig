@@ -1,0 +1,8 @@
+[user]
+	name = Andre Paim Lemos
+	email = andrepaim@gmail.com
+
+# Machine-specific or private settings (work identity, credential helpers,
+# signing keys) belong in ~/.gitconfig.local, which is never committed.
+[include]
+	path = ~/.gitconfig.local

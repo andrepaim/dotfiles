@@ -1,0 +1,229 @@
+{
+  "model": "opus",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Bash",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" PowerShell",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Read",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Write",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Edit",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Grep",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Glob",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Agent",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" WebSearch",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" WebFetch",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" Skill",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event Notification"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event Stop"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event SubagentStop"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event SubagentStart",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event SessionStart"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event UserPromptSubmit",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event PreToolUse",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" ] || sh \"${WMUX_BASH_SCRIPT%/*}/wmux-hook-wsl.sh\" --event SessionEnd"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "sentry@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "high"
+    }
+  },
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": true,
+  "allowedTools": [
+    "Edit",
+    "Read",
+    "Write"
+  ]
+}

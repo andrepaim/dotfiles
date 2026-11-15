@@ -3,3 +3,22 @@
 .vim/autoload/plug.vim
 .vim/plugged/
 .vim/undodir/
+
+# Never commit credentials, tokens, or machine-local overrides, even if a
+# tool's directory is copied into the repository by mistake.
+.credentials.json
+auth.json
+.npmrc
+.netrc
+.env
+.env.*
+.ssh/
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+*.local
+.gitconfig.local
+history.jsonl
+*.sqlite
+*.sqlite-*

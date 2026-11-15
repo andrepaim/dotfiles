@@ -55,10 +55,21 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -lharS'
 
+# Homebrew (macOS Apple Silicon, macOS Intel, Linuxbrew).
+for brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+	if [[ -x "$brew" ]]; then
+		eval "$("$brew" shellenv)"
+		break
+	fi
+done
+unset brew
+
 # User-installed tools. `path` is unique, so repeated sourcing does not add
 # duplicate entries.
+export BUN_INSTALL="$HOME/.bun"
 typeset -U path PATH
 path=(
+	"$BUN_INSTALL/bin"
 	"$HOME/.opencode/bin"
 	"$HOME/bin"
 	"$HOME/.npm-global/bin"
@@ -72,3 +83,6 @@ if [[ -d "$HOME/android-sdk" ]]; then
 elif [[ -d "$HOME/Library/Android/sdk" ]]; then
 	export ANDROID_HOME="$HOME/Library/Android/sdk"
 fi
+
+# Machine-specific additions that should not be committed.
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

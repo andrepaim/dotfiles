@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "skills": {
+    "loopy": {
+      "source": "Forward-Future/loopy",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/Forward-Future/loopy.git",
+      "skillPath": "skills/loopy/SKILL.md",
+      "skillFolderHash": "29f8d21b72ea1326ceac048b362ff344ecb5fcab",
+      "installedAt": "2026-07-14T09:59:48.065Z",
+      "updatedAt": "2026-07-14T09:59:48.065Z"
+    }
+  },
+  "dismissed": {}
+}

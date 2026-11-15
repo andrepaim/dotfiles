@@ -1,0 +1,15 @@
+[Unit]
+Description=Saldo local dashboard
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=__HOME__/src/saldo
+ExecStart=/usr/bin/env node __HOME__/src/saldo/dist/src/cli/index.js serve --host 127.0.0.1 --port 4310
+Environment="PATH=__HOME__/.local/bin:__HOME__/bin:__HOME__/.npm-global/bin:__HOME__/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+Restart=on-failure
+RestartSec=3
+UMask=0077
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,24 @@
+# Seeded by bootstrap.sh. Codex rewrites this file (project trust, model
+# picks), so bootstrap copies it only when ~/.codex/config.toml is missing.
+# __HOME__ is replaced with $HOME at install time.
+approvals_reviewer = "user"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "approval-mode", "context-remaining", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "git-branch", "branch-changes", "run-state", "permissions"]
+status_line_use_colors = true
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "__HOME__/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.sentry-plugin-marketplace]
+source_type = "git"
+source = "https://github.com/getsentry/plugin-codex.git"
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."sentry@sentry-plugin-marketplace"]
+enabled = true

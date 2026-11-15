@@ -1,0 +1,8 @@
+[Unit]
+Description=agent-deck unattended update
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=AGENTDECK_UPDATE_TRIGGER=timer
+ExecStart=__HOME__/.local/bin/agent-deck update --unattended --trigger timer

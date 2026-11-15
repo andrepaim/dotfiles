@@ -1,0 +1,4 @@
+interface:
+  display_name: "WhatsApp via wacli"
+  short_description: "Read and manage WhatsApp through wacli"
+  default_prompt: "Use $wacli to find my recent WhatsApp messages."

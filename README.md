@@ -1,89 +1,108 @@
 # Dotfiles
 
-A focused zsh, tmux, and Vim setup for WSL, Linux, and macOS.
+Shell, terminal, editor, and AI-agent configuration for WSL, Linux, and macOS.
 
-The repository does not install packages, change the login shell, or modify
-operating-system settings. `bootstrap.sh` only links an explicit list of
-configuration files into `$HOME`.
-
-## Installed files
-
-| Repository file | Destination | Purpose |
-| --- | --- | --- |
-| `.zshrc` | `~/.zshrc` | Shell history, completion, prompt, aliases, and user paths |
-| `.tmux.conf` | `~/.tmux.conf` | tmux behavior, keybindings, and Tokyo Night theme |
-| `.tmux/status.sh` | `~/.tmux/status.sh` | Portable status metrics and clipboard integration |
-| `.vimrc` | `~/.vimrc` | Vim behavior, mappings, plugins, and status line |
-| `.vim/colors/tokyonight_custom.vim` | `~/.vim/colors/tokyonight_custom.vim` | Fallback Tokyo Night colorscheme |
-
-No other repository file is installed.
-
-## Requirements
-
-The installer requires Bash and standard Unix tools such as `ln`, `mv`, and
-`mkdir`. The configuration itself expects:
-
-- zsh
-- tmux
-- Vim
-- Git and curl for automatic Vim plugin installation
-- ripgrep for Vim's `:Rg` command
-
-Vim downloads vim-plug and the configured plugins on first launch. Generated
-plugin checkouts, undo history, shell history, and caches are intentionally not
-stored in this repository.
-
-Clipboard integration selects the first available command:
-
-- WSL: `clip.exe`
-- macOS: `pbcopy`
-- Wayland Linux: `wl-copy`
-- X11 Linux: `xclip` or `xsel`
-
-GPU status is shown only when `nvidia-smi` is available. CPU, memory, disk, and
-uptime status support Linux and macOS without additional scripts.
+`bootstrap.sh` installs an explicit manifest into `$HOME`. It does not install
+packages, change the login shell, or modify operating-system settings (except
+the opt-in `wsl-ssh` group, which uses `sudo`).
 
 ## Install
-
-Clone the repository and inspect the planned changes:
 
 ```sh
 git clone git@github.com:andrepaim/dotfiles.git ~/src/dotfiles
 cd ~/src/dotfiles
-./bootstrap.sh --dry-run
+./bootstrap.sh --dry-run   # inspect the plan
+./bootstrap.sh             # install every default group
+./bootstrap.sh tmux vim    # or only some groups
 ```
 
-Install the links:
+When a destination already exists, the installer asks once and moves it under
+`~/.dotfiles-backup/<timestamp>/` before installing. `--force` skips the
+question; backups are still made. The script is idempotent and runs on the
+Bash 3.2 that ships with macOS.
 
-```sh
-./bootstrap.sh
-```
+## Linked vs. seeded files
 
-When a destination already exists, the installer asks for confirmation and
-moves it under `~/.dotfiles-backup/<timestamp>/` before creating the link. Use
-`--force` to skip that confirmation; backups are still created.
+- **Linked** files are symlinks into this checkout. `git pull` updates them
+  immediately, and edits made through `~/...` show up in `git status`.
+- **Seeded** files are copied once, because the owning tool rewrites them at
+  runtime (project trust lists, approval rules, UI state). Existing seeded
+  files are kept; bootstrap reports them as `keep` when they differ. Use
+  `./bootstrap.sh --dry-run --update-seeds` to see what would be replaced, and
+  `--update-seeds` to replace them (with a backup). Seeds may contain
+  `__HOME__` and `__USER__`, which are rendered at install time.
 
-The script is idempotent. Links that already point to this checkout are left
-unchanged.
+## Groups
 
-To make zsh the login shell after installing it, use the operating system's
-normal `chsh` command. The bootstrap script deliberately does not do this.
+| Group | Files | Mode |
+| --- | --- | --- |
+| `shell` | `.bashrc`, `.zshrc` | link |
+| `git` | `.gitconfig`, `.config/git/ignore` | link |
+| `tmux` | `.tmux.conf`, `.tmux/status.sh` | link |
+| `vim` | `.vimrc`, `.vim/colors/tokyonight_custom.vim` | link |
+| `agents` | `.claude/statusline-command.sh` | link |
+| | `.claude/settings.json`, `.codex/config.toml`, `.codex/rules/default.rules`, `.config/opencode/opencode.jsonc`, `.pi/agent/settings.json`, `.config/agent-deck/config.toml` | seed |
+| `skills` | `skills/*` into `~/.agents/skills`, `~/.claude/skills`, `~/.codex/skills` (see [skills/README.md](skills/README.md)) | link |
+| | `.agents/.skill-lock.json` | seed |
+| `tools` | `.config/btop/btop.conf`, `.config/htop/htoprc` | seed |
+| `services` | `.config/systemd/user/{agent-deck-autoupdate.service,agent-deck-autoupdate.timer,saldo.service}`, then `systemctl --user enable` | seed |
+| `wsl-ssh` (opt-in) | `wsl/ssh/*.conf` into `/etc/ssh/sshd_config.d/` and `/etc/systemd/system/ssh.socket.d/` | sudo copy |
+
+Platform handling:
+
+- `services` runs only on Linux with a systemd user session (including WSL
+  with systemd enabled). Each unit is installed only when what it runs exists
+  (`~/.local/bin/agent-deck`, `~/src/saldo`).
+- `wsl-ssh` refuses to run outside WSL. After it runs, expose sshd on the LAN
+  from an elevated Windows PowerShell:
+
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File wsl\configure-ssh-portproxy.ps1 `
+    -ListenAddress <windows-lan-ip> -RemoteSubnet <lan-cidr>
+  ```
+
+  The drop-in allows password authentication for the installing user; keep the
+  firewall rule restricted to your LAN subnet.
+
+## Requirements
+
+- zsh or bash, tmux, Vim
+- Git and curl (Vim installs vim-plug and plugins on first launch)
+- ripgrep for Vim's `:Rg`
+- jq for the Claude Code status line
+
+Clipboard integration in tmux and Vim picks the first available of
+`clip.exe` (WSL), `pbcopy` (macOS), `wl-copy`, `xclip`, or `xsel`. GPU status
+appears only when `nvidia-smi` exists. Homebrew is added to `PATH` when found.
+
+## Local, uncommitted overrides
+
+| File | Read by |
+| --- | --- |
+| `~/.bashrc.local` | `.bashrc` |
+| `~/.zshrc.local` | `.zshrc` |
+| `~/.gitconfig.local` | `.gitconfig` (work identity, credential helpers, signing) |
+
+Because `~/.gitconfig` is a link, `git config --global ...` writes into this
+checkout; use `git config --file ~/.gitconfig.local ...` for anything private.
+
+## What is never stored here
+
+Credentials and tokens (`~/.claude/.credentials.json`, `~/.codex/auth.json`,
+`~/.pi/agent/auth.json`, `~/.npmrc`, `~/.ssh/`), shell and agent history,
+sessions, caches, and databases. `.gitignore` blocks the common names as a
+second line of defence.
 
 ## Update
-
-Because the installed files are symbolic links, pulling changes into the
-checkout updates the active configuration immediately:
 
 ```sh
 cd ~/src/dotfiles
 git pull --ff-only
+./bootstrap.sh   # only needed when the manifest changes
 ```
-
-Run `./bootstrap.sh` again only when the install manifest changes or links have
-been removed.
 
 ## Uninstall
 
-Remove only links that point into this checkout, then restore any desired files
-from `~/.dotfiles-backup/`. The repository does not provide an automatic
-uninstaller so it cannot accidentally remove unrelated user files.
+Remove the links that point into this checkout and restore what you need from
+`~/.dotfiles-backup/`. There is no automatic uninstaller, so nothing unrelated
+can be removed by accident.
